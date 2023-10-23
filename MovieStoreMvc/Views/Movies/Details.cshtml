@@ -1,0 +1,88 @@
+﻿@model MovieStoreMvc.Models.Movie
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Movie</h4>
+    <hr />
+    <div class="row">
+        <div class="col-sm-3">
+            <img src="/uploads/posters/@Model.PosterUrl" style="width:75%" />
+        </div>
+        <div class="col-sm-9">
+            <h2>@Model.Title</h2>
+            <hr />
+            <strong>Đạo diễn: </strong>@Model.Director<br />
+            <strong>Diễn viên: </strong>@Model.Cast<br />
+            <strong>Thể loại: </strong>
+            @{
+                string result = "";
+                foreach (var genre in Model.genres)
+                {
+                    result += genre.Name + ", ";
+                }
+                result = result.Substring(0, result.Length - 2);
+                <span>@result</span>
+            }
+            <br />
+            <strong>Khởi chiếu: </strong>@Model.ReleaseDate.ToString("dd/MM/yyyy")<br />
+            <strong>Thời lượng: </strong>@Model.RunningTime <span>phút</span><br />
+            <strong>Ngôn ngữ: </strong>@Model.Language<br />
+            <strong>Rated: </strong>@Model.rating.Name<br />
+
+
+            <div class="mt-3">
+                <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+                <a asp-action="Index">Back to List</a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <div class="text-center">
+            <div class="btn-group mb-3">
+                <a id="btn-mota" class="btn btn-outline-danger active" aria-current="page">Mô tả</a>
+                <a id="btn-trailer" class="btn btn-outline-danger">Trailer</a>
+            </div>
+        </div>
+        <div class="trailer" style="display: none">
+
+            @{
+                string newUrl = Model.Trailer.Replace("youtu.be", "www.youtube.com/embed");
+                <iframe width="560" height="315" src="@newUrl" title="@Model.Title trailer - KC: @Model.ReleaseDate.ToString("dd.MM.yyyy")" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            }
+
+        </div>
+        <div class="mota">
+            @Model.Description
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+
+    }
+    <script>
+        $(document).ready(function () {
+            $("#btn-trailer").click(function () {
+                $(".mota").hide();
+                $(".trailer").show();
+                $(this).addClass("active");
+                $("#btn-mota").removeClass("active");
+            });
+            $("#btn-mota").click(function () {
+                $(".trailer").hide();
+                $(".mota").show();
+                $(this).addClass("active");
+                $("#btn-trailer").removeClass("active");
+        });
+        });
+    </script>
+}

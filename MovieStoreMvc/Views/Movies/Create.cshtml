@@ -1,0 +1,176 @@
+﻿@model MovieStoreMvc.Models.Movie
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Movie</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Poster" class="control-label"></label>
+                <input asp-for="Poster" type="file" class="form-control" />
+                <span asp-validation-for="Poster" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Director" class="control-label"></label>
+                <input asp-for="Director" class="form-control" />
+                <span asp-validation-for="Director" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cast" class="control-label"></label>
+                <input asp-for="Cast" class="form-control" />
+                <span asp-validation-for="Cast" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReleaseDate" class="control-label"></label>
+                <input asp-for="ReleaseDate" class="form-control" />
+                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndDate" class="control-label"></label>
+                <input asp-for="EndDate" class="form-control" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RunningTime" class="control-label">Running Time (minutes)</label>
+                <input asp-for="RunningTime" class="form-control" />
+                <span asp-validation-for="RunningTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Language" class="control-label"></label>
+                <input asp-for="Language" class="form-control" />
+                <span asp-validation-for="Language" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Trailer" class="control-label"></label>
+                <input asp-for="Trailer" class="form-control" />
+                <span asp-validation-for="Trailer" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="genres" class="control-label">Genres</label>
+                <table>
+                    <tr>
+                        @{
+                            int cnt = 0;
+                            List<MovieStoreMvc.Models.CinemaViewModel.MovieGenreData> genres = ViewBag.Genres;
+
+                            foreach (var genre in genres)
+                            {
+                                if (cnt++ % 3 == 0)
+                                {
+                                    @:</tr><tr>
+                                }
+                                <td class="pe-3">
+                                    <input type="checkbox"
+                                            name="selectedGenres"
+                                            value="@genre.GenreId" 
+                                            @(Html.Raw(genre.Checked ? "checked=\"checked\"" : "")) />
+                                            @genre.Name
+                                </td>
+                            }
+                            @:</tr>
+                        }
+                </table>
+                <span asp-validation-for="genres" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="formats" class="control-label">Formats</label>
+                <table>
+                    <tr>
+                        @{
+                            int cntfm = 0;
+                            List<MovieStoreMvc.Models.CinemaViewModel.MovieFormatData> formats = ViewBag.Formats;
+
+                            foreach (var format in formats)
+                            {
+                                if (cntfm++ % 3 == 0)
+                                {
+                                    @:</tr><tr>
+                                }
+                                <td class="pe-3">
+                                    <input type="checkbox"
+                                            name="selectedFormats"
+                                            value="@format.FormatId"
+                                            @(Html.Raw(format.Checked ? "checked=\"checked\"" : "")) />
+                                            @format.Name
+                                </td>
+                            }
+                            @:</tr>
+                        }
+                </table>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="countries" class="control-label">Countries</label>
+                <table>
+                    <tr>
+                        @{
+                            int cntct = 0;
+                            List<MovieStoreMvc.Models.CinemaViewModel.MovieCountryData> countries = ViewBag.Countries;
+
+                            foreach (var country in countries)
+                            {
+                                if (cntct++ % 3 == 0)
+                                {
+                                    @:</tr><tr>
+                                }
+                                <td class="pe-3">
+                                    <input type="checkbox"
+                                            name="selectedCountries"
+                                            value="@country.CountryId" 
+                                            @(Html.Raw(country.Checked ? "checked=\"checked\"" : "")) />
+                                            @country.Name
+                                </td>
+                            }
+                            @:</tr>
+                        }
+                </table>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ManuId" class="control-label"></label>
+                <select asp-for="ManuId" class ="form-control" asp-items="ViewBag.ManuId">
+                    <option value="" hidden>-- Select Manufacturer --</option>
+                </select>
+                <span asp-validation-for="ManuId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RatingId" class="control-label"></label>
+                <select asp-for="RatingId" class ="form-control" asp-items="ViewBag.RatingId">
+                    <option value="" hidden>-- Select Rating --</option>
+                </select>
+                <span asp-validation-for="RatingId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

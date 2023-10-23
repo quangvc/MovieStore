@@ -1,0 +1,44 @@
+﻿@model IEnumerable<MovieStoreMvc.Models.Movie>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Movies</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<div class="row">
+@foreach (var item in Model)
+{
+        <div class="card col-sm-3 mt-3 border border-0">
+            <a asp-action="Details" asp-route-id="@item.Id">
+                <img src="/uploads/posters/@item.PosterUrl" style="width:75%; height: 20rem; border: 6px solid black;" class="card-img-top d-block mx-auto" alt="@item.Title poster">
+            </a>
+            <div class="card-body row">
+                <h5 class="card-title">@item.Title</h5>
+                <p class="card-text">
+                    <strong>Thể loại: </strong>
+                    @{
+                        string result = "";
+                        foreach (var genre in item.genres)
+                        {
+                            result += genre.Name + ", ";
+                        }
+                        result = result.Substring(0, result.Length - 2);
+                        <span>@result</span>
+                    }<br>
+                    <strong>Thời lượng: </strong><span>@item.RunningTime phút</span><br>
+                    <strong>Khởi chiếu: </strong><span>@item.ReleaseDate.ToString("dd/MM/yyyy")</span><br>
+                </p>
+                <div class="d-flex align-items-end">
+                    <a asp-action="Edit" asp-route-id="@item.Id" >Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" >Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" >Delete</a>
+                </div>
+            </div>
+        </div>
+}
+</div>
