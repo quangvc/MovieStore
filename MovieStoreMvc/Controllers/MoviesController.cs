@@ -26,17 +26,47 @@ namespace MovieStoreMvc.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string movieStatus, string searchString)
         {
-            var applicationDbContext = _context.Movie
+            var movies = _context.Movie
                 .Include(m => m.manufacturer)
                 .Include(m => m.rating)
                 .Include(m => m.genres)
                 .Include(m => m.formats)
                 .Include(m => m.countries)
-                .OrderByDescending(m => m.ReleaseDate)
                 .AsNoTracking();
-            return View(await applicationDbContext.ToListAsync());
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                movies = movies.Where(s => s.Title!.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(movieStatus))
+            {
+                if (movieStatus == "nowShowing")
+                {
+                    movies = movies.Where(x => x.ReleaseDate <= DateTime.Now && x.EndDate >= DateTime.Now);
+                } else if (movieStatus == "comingSoon")
+                {
+                    movies = movies.Where(x => x.ReleaseDate >= DateTime.Now);
+                } else if (movieStatus == "expired")
+                {
+                    movies = movies.Where(x => x.EndDate <= DateTime.Now);
+                }
+
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            ViewBag.MovieStatusList = new SelectList(new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "Tất cả" },
+                new SelectListItem { Value = "nowShowing", Text = "Đang chiếu" },
+                new SelectListItem { Value = "comingSoon", Text = "Sắp chiếu" },
+                new SelectListItem { Value = "expired", Text = "Đã hết hạn" }
+            }, "Value", "Text", movieStatus);
+
+            return View(await movies.OrderByDescending(m => m.ReleaseDate).ToListAsync());
         }
 
         // GET: Movies/Details/5
