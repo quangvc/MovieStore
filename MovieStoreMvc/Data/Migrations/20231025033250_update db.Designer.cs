@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStoreMvc.Data;
 
@@ -11,9 +12,10 @@ using MovieStoreMvc.Data;
 namespace MovieStoreMvc.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231025033250_update db")]
+    partial class updatedb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -694,7 +696,7 @@ namespace MovieStoreMvc.Data.Migrations
             modelBuilder.Entity("MovieStoreMvc.Models.Seat", b =>
                 {
                     b.HasOne("MovieStoreMvc.Models.Room", "room")
-                        .WithMany("Seats")
+                        .WithMany()
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -708,11 +710,6 @@ namespace MovieStoreMvc.Data.Migrations
                     b.Navigation("room");
 
                     b.Navigation("seatType");
-                });
-
-            modelBuilder.Entity("MovieStoreMvc.Models.Room", b =>
-                {
-                    b.Navigation("Seats");
                 });
 #pragma warning restore 612, 618
         }

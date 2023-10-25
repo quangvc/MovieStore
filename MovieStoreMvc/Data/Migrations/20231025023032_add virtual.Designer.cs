@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStoreMvc.Data;
 
@@ -11,9 +12,10 @@ using MovieStoreMvc.Data;
 namespace MovieStoreMvc.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231025023032_add virtual")]
+    partial class addvirtual
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -487,8 +489,6 @@ namespace MovieStoreMvc.Data.Migrations
 
                     b.HasIndex("CinemaId");
 
-                    b.HasIndex("RoomTypeId");
-
                     b.ToTable("Room");
                 });
 
@@ -510,12 +510,6 @@ namespace MovieStoreMvc.Data.Migrations
 
             modelBuilder.Entity("MovieStoreMvc.Models.Seat", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("Position")
                         .HasColumnType("nvarchar(450)");
 
@@ -525,15 +519,11 @@ namespace MovieStoreMvc.Data.Migrations
                     b.Property<int>("SeatTypeId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("Position", "RoomId");
 
                     b.HasIndex("RoomId");
 
                     b.HasIndex("SeatTypeId");
-
-                    b.HasIndex("Position", "RoomId")
-                        .IsUnique()
-                        .HasFilter("[Position] IS NOT NULL");
 
                     b.ToTable("Seat");
                 });
@@ -680,21 +670,13 @@ namespace MovieStoreMvc.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieStoreMvc.Models.RoomType", "roomType")
-                        .WithMany()
-                        .HasForeignKey("RoomTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("cinema");
-
-                    b.Navigation("roomType");
                 });
 
             modelBuilder.Entity("MovieStoreMvc.Models.Seat", b =>
                 {
                     b.HasOne("MovieStoreMvc.Models.Room", "room")
-                        .WithMany("Seats")
+                        .WithMany()
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -708,11 +690,6 @@ namespace MovieStoreMvc.Data.Migrations
                     b.Navigation("room");
 
                     b.Navigation("seatType");
-                });
-
-            modelBuilder.Entity("MovieStoreMvc.Models.Room", b =>
-                {
-                    b.Navigation("Seats");
                 });
 #pragma warning restore 612, 618
         }

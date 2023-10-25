@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStoreMvc.Data;
 
@@ -11,9 +12,10 @@ using MovieStoreMvc.Data;
 namespace MovieStoreMvc.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231025065734_update 1 to many")]
+    partial class update1tomany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -471,23 +473,23 @@ namespace MovieStoreMvc.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CinemaId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoomTypeId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("TotalSeat")
                         .HasColumnType("int");
 
+                    b.Property<int?>("cinemaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("roomTypeId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CinemaId");
+                    b.HasIndex("cinemaId");
 
-                    b.HasIndex("RoomTypeId");
+                    b.HasIndex("roomTypeId");
 
                     b.ToTable("Room");
                 });
@@ -522,14 +524,14 @@ namespace MovieStoreMvc.Data.Migrations
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SeatTypeId")
+                    b.Property<int?>("seatTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId");
 
-                    b.HasIndex("SeatTypeId");
+                    b.HasIndex("seatTypeId");
 
                     b.HasIndex("Position", "RoomId")
                         .IsUnique()
@@ -676,15 +678,11 @@ namespace MovieStoreMvc.Data.Migrations
                 {
                     b.HasOne("MovieStoreMvc.Models.Cinema", "cinema")
                         .WithMany()
-                        .HasForeignKey("CinemaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("cinemaId");
 
                     b.HasOne("MovieStoreMvc.Models.RoomType", "roomType")
                         .WithMany()
-                        .HasForeignKey("RoomTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("roomTypeId");
 
                     b.Navigation("cinema");
 
@@ -701,9 +699,7 @@ namespace MovieStoreMvc.Data.Migrations
 
                     b.HasOne("MovieStoreMvc.Models.SeatType", "seatType")
                         .WithMany()
-                        .HasForeignKey("SeatTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("seatTypeId");
 
                     b.Navigation("room");
 

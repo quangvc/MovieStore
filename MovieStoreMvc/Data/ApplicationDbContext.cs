@@ -64,7 +64,26 @@ namespace MovieStoreMvc.Data
             {
                 c.HasIndex(e => e.Name).IsUnique();
             });
+
+            builder.Entity<Room>(c =>
+            {
+                c.HasMany(i => i.Seats);
+            });
+
+            builder.Entity<Seat>()
+                .HasIndex(s => new { s.Position, s.RoomId }).IsUnique();
+
         }
+
+        public DbSet<MovieStoreMvc.Models.RoomType> RoomType { get; set; }
+
+        public DbSet<MovieStoreMvc.Models.SeatType> SeatType { get; set; }
+
+        public DbSet<MovieStoreMvc.Models.Cinema> Cinema { get; set; }
+
+        public DbSet<MovieStoreMvc.Models.Room> Room { get; set; }
+
+        public DbSet<MovieStoreMvc.Models.Seat> Seat { get; set; }
 
 
     }
