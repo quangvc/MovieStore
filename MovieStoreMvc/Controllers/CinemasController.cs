@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,7 +23,34 @@ namespace MovieStoreMvc.Controllers
         // GET: Cinemas
         public async Task<IActionResult> Index()
         {
-              return View(await _context.Cinema.ToListAsync());
+            var data = await _context.Cinema.Include(r => r.Rooms)
+                .Select(c => new Cinema
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Address = c.Address,
+                    Phone = c.Phone,
+                    TotalRoom = c.Rooms.Count(),
+                    TotalSeat = c.Rooms.SelectMany(r => r.Seats).Count()
+                })
+                .ToListAsync();
+
+            //data = (from d in data
+            //        select new Cinema()
+            //        {
+            //            Id = d.Id,
+            //            Name = d.Name,
+            //            Address = d.Address,
+            //            Phone = d.Phone,
+            //            TotalRoom = d.Rooms.Count(),
+            //            TotalSeat = (from s in d.Rooms
+            //                         select new
+            //                         {
+            //                             tong = s.Seats.Count()
+            //                         }).Sum(d => d.tong),
+            //        }).ToList();
+
+            return View(data);
         }
 
         // GET: Cinemas/Details/5
@@ -148,14 +176,14 @@ namespace MovieStoreMvc.Controllers
             {
                 _context.Cinema.Remove(cinema);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CinemaExists(int id)
         {
-          return _context.Cinema.Any(e => e.Id == id);
+            return _context.Cinema.Any(e => e.Id == id);
         }
     }
 }

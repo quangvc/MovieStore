@@ -11,6 +11,7 @@ namespace MovieStoreMvc.Models
         public string Phone { get; set; }
         public int? TotalRoom { get; set; } = 0;
         public int? TotalSeat { get; set; } = 0;
+        public virtual List<Room> Rooms { get; set; }
 
     }
 }

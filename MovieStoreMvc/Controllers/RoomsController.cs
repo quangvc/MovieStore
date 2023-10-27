@@ -75,7 +75,7 @@ namespace MovieStoreMvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,TotalSeat")] Room room)
+        public async Task<IActionResult> Create([Bind("CinemaId,RoomTypeId,Name")] Room room)
         {
             if (ModelState.IsValid)
             {
@@ -112,7 +112,7 @@ namespace MovieStoreMvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,TotalSeat")] Room room)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CinemaId,RoomTypeId")] Room room)
         {
             if (id != room.Id)
             {

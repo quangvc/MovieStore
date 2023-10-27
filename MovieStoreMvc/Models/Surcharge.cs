@@ -6,7 +6,7 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public int Value { get; set; }
-        public int FormatId { get; set; }
+        public int? FormatId { get; set; }
         public int? RoomId { get; set; }
         public int? SeatId { get; set; }
         public virtual Room? room { get; set; }

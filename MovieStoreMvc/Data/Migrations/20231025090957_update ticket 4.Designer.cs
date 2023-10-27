@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStoreMvc.Data;
 
@@ -11,9 +12,10 @@ using MovieStoreMvc.Data;
 namespace MovieStoreMvc.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231025090957_update ticket 4")]
+    partial class updateticket4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -620,7 +622,7 @@ namespace MovieStoreMvc.Data.Migrations
                     b.Property<int>("SeatId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShowtimesId")
+                    b.Property<int?>("ShowtimesId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedDate")
@@ -628,10 +630,9 @@ namespace MovieStoreMvc.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ShowtimesId");
+                    b.HasIndex("SeatId");
 
-                    b.HasIndex("SeatId", "ShowtimesId")
-                        .IsUnique();
+                    b.HasIndex("ShowtimesId");
 
                     b.ToTable("Ticket");
                 });
@@ -826,9 +827,7 @@ namespace MovieStoreMvc.Data.Migrations
 
                     b.HasOne("MovieStoreMvc.Models.Showtimes", "showtimes")
                         .WithMany()
-                        .HasForeignKey("ShowtimesId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ShowtimesId");
 
                     b.Navigation("seat");
 

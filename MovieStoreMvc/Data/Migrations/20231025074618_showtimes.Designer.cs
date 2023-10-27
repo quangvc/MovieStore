@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStoreMvc.Data;
 
@@ -11,9 +12,10 @@ using MovieStoreMvc.Data;
 namespace MovieStoreMvc.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231025074618_showtimes")]
+    partial class showtimes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -597,45 +599,6 @@ namespace MovieStoreMvc.Data.Migrations
                     b.ToTable("Showtimes");
                 });
 
-            modelBuilder.Entity("MovieStoreMvc.Models.Ticket", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SeatId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShowtimesId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShowtimesId");
-
-                    b.HasIndex("SeatId", "ShowtimesId")
-                        .IsUnique();
-
-                    b.ToTable("Ticket");
-                });
-
             modelBuilder.Entity("CountryMovie", b =>
                 {
                     b.HasOne("MovieStoreMvc.Models.Country", null)
@@ -814,25 +777,6 @@ namespace MovieStoreMvc.Data.Migrations
                     b.Navigation("movie");
 
                     b.Navigation("room");
-                });
-
-            modelBuilder.Entity("MovieStoreMvc.Models.Ticket", b =>
-                {
-                    b.HasOne("MovieStoreMvc.Models.Seat", "seat")
-                        .WithMany()
-                        .HasForeignKey("SeatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MovieStoreMvc.Models.Showtimes", "showtimes")
-                        .WithMany()
-                        .HasForeignKey("ShowtimesId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("seat");
-
-                    b.Navigation("showtimes");
                 });
 
             modelBuilder.Entity("MovieStoreMvc.Models.Room", b =>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieStoreMvc.Data;
 
@@ -11,9 +12,10 @@ using MovieStoreMvc.Data;
 namespace MovieStoreMvc.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231025085055_add ticket")]
+    partial class addticket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -620,18 +622,21 @@ namespace MovieStoreMvc.Data.Migrations
                     b.Property<int>("SeatId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShowtimesId")
+                    b.Property<int>("ShowTimeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("showtimesId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ShowtimesId");
-
-                    b.HasIndex("SeatId", "ShowtimesId")
-                        .IsUnique();
+                    b.HasIndex("showtimesId");
 
                     b.ToTable("Ticket");
                 });
@@ -818,19 +823,9 @@ namespace MovieStoreMvc.Data.Migrations
 
             modelBuilder.Entity("MovieStoreMvc.Models.Ticket", b =>
                 {
-                    b.HasOne("MovieStoreMvc.Models.Seat", "seat")
-                        .WithMany()
-                        .HasForeignKey("SeatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MovieStoreMvc.Models.Showtimes", "showtimes")
                         .WithMany()
-                        .HasForeignKey("ShowtimesId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("seat");
+                        .HasForeignKey("showtimesId");
 
                     b.Navigation("showtimes");
                 });

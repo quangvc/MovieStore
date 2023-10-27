@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MovieStoreMvc.Models;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
 
 namespace MovieStoreMvc.Data
 {
@@ -73,6 +74,17 @@ namespace MovieStoreMvc.Data
             builder.Entity<Seat>()
                 .HasIndex(s => new { s.Position, s.RoomId }).IsUnique();
 
+            builder.Entity<Ticket>()
+                .HasIndex(s => new { s.SeatId, s.ShowtimesId }).IsUnique();
+
+            //builder.Entity<Seat>()
+            //.HasKey(c => new { c.Position, c.RoomId });
+
+            builder.Entity<Ticket>()
+                .HasOne(e => e.showtimes)
+                .WithMany()
+                .HasForeignKey(c => c.ShowtimesId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<MovieStoreMvc.Models.RoomType> RoomType { get; set; }
@@ -84,6 +96,10 @@ namespace MovieStoreMvc.Data
         public DbSet<MovieStoreMvc.Models.Room> Room { get; set; }
 
         public DbSet<MovieStoreMvc.Models.Seat> Seat { get; set; }
+
+        public DbSet<MovieStoreMvc.Models.Showtimes> Showtimes { get; set; }
+
+        public DbSet<MovieStoreMvc.Models.Ticket> Ticket { get; set; }
 
 
     }
