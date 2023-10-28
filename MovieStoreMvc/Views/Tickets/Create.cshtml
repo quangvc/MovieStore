@@ -14,9 +14,30 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
-                <label class="control-label">Room</label>
-                <select class="form-control" id="room" name="room" asp-items="ViewBag.Room">
-                    <option value="" hidden>-- Chọn Room --</option>
+                <label class="control-label">Movie</label>
+                <select class="form-control" id="movie" name="movie" asp-items="ViewBag.Movie">
+                    <option value="" hidden>-- Chọn phim --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Cinema</label>
+                <select class="form-control" id="cinema" name="cinema" asp-items="ViewBag.Cinema">
+                    <option value="" hidden>-- Chọn rạp --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Ngày</label>
+                <select class="form-control" id="date" name="date" asp-items="ViewBag.Date">
+                    @* <option value="" hidden>-- Chọn ngày --</option> *@
+                </select>
+            </div>
+
+            <div class="form-group d-none" id="showtimes-block">
+                <label class="control-label">Lịch chiếu</label>
+                <select class="form-control" id="showtimes" name="showtimes">
+                    <option value="" hidden>-- Chọn lịch chiếu --</option>
                 </select>
             </div>
 
@@ -24,25 +45,6 @@
                 <label class="control-label">Seat</label>
                 <select class="form-control" id="seat" name="seat">
                     <option value="" hidden>-- Chọn Seat --</option>
-                </select>
-            </div>
-
-            @* <div class="form-group">
-                <label asp-for="ShowtimesId" class="control-label"></label>
-                <select asp-for="ShowtimesId" class="form-control" asp-items="ViewBag.ShowtimesId"></select>
-            </div> *@
-
-            <div class="form-group">
-                <label class="control-label">Ngày</label>
-                <select class="form-control" id="date" name="date" asp-items="ViewBag.Date">
-                    <option value="" hidden>-- Chọn ngày --</option>
-                </select>
-            </div>
-
-            <div class="form-group d-none" id="time-block">
-                <label class="control-label">Giờ</label>
-                <select class="form-control" id="time" name="time">
-                    <option value="" hidden>-- Chọn Giờ --</option>
                 </select>
             </div>
 
@@ -70,36 +72,42 @@
 
     <script>
         $(document).ready(function () {
-            $("#room").on("change", function () {
-                var roomId = $('#room').val();
+
+            $("#movie,#cinema,#date").on("change", function () {
+                var movie = $('#movie').val();
+                var cinema = $('#cinema').val();
+                var date = $('#date').val();
+                if (movie != "" && cinema != "") {
+                    $("#showtimes-block").removeClass("d-none");
+
+                    $.ajax({
+                        type: 'GET',
+                        url: 'GetShowtimes?date=' + date,
+                        success: function (data, status, xhr) {
+
+                            $("option.showtimes-option").remove();
+                            $.each(data, function (index, value) {
+                                $("#showtimes").append('<option class="showtimes-option" value="' + value.id + '">' + value.showtimes + '</option>');
+                            });
+                        }
+                    });
+                }
+                
+            });
+
+            $("#showtimes").on("change", function () {
+                var showtimesId = $('#showtimes').val();
                 $("#seat-block").removeClass("d-none");
 
                 $.ajax({
                     type: 'GET',
                     // dataType: "json",
-                    url: 'GetSeats?roomId=' + roomId,
+                    url: 'GetSeats?showtimesId=' + showtimesId,
                     success: function (data, status, xhr) {
-                        
+
                         $("option.seat-option").remove();
                         $.each(data, function (index, value) {
-                            $("#seat").append('<option class="seat-option"' + 'value="' + value + '">' + value + '</option>');
-                        });
-                    }
-                });
-            });
-
-            $("#date").on("change", function () {
-                var date = $('#date').val();
-                $("#time-block").removeClass("d-none");
-
-                $.ajax({
-                    type: 'GET',
-                    url: 'GetTimes?date=' + date,
-                    success: function (data, status, xhr) {
-
-                        $("option.time-option").remove();
-                        $.each(data, function (index, value) {
-                            $("#time").append('<option class="time-option"' + 'value="' + value + '">' + value + '</option>');
+                            $("#seat").append('<option class="seat-option" value="' + value + '">' + value + '</option>');
                         });
                     }
                 });

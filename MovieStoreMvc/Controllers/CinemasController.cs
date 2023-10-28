@@ -23,7 +23,7 @@ namespace MovieStoreMvc.Controllers
         // GET: Cinemas
         public async Task<IActionResult> Index()
         {
-            var data = await _context.Cinema.Include(r => r.Rooms)
+            var data = await _context.Cinema
                 .Select(c => new Cinema
                 {
                     Id = c.Id,

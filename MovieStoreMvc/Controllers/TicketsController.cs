@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -55,7 +56,7 @@ namespace MovieStoreMvc.Controllers
         // GET: Tickets/Create
         public IActionResult Create()
         {
-            ViewData["Room"] = new SelectList(_context.Room.Select(s => new
+            ViewData["Cinema"] = new SelectList(_context.Cinema.Select(s => new
             {
                 Id = s.Id,
                 Name = s.Name
@@ -72,14 +73,10 @@ namespace MovieStoreMvc.Controllers
             }
 
             ViewData["Date"] = new SelectList(
-                //_context.Showtimes.Where(s => s.StartTime > DateTime.Now)
-                //.Select(s => new
-                //{
-                //    Date = s.StartTime.ToString("dd/MM/yyyy")
-                //}).ToList().Distinct(), "Date", "Date");
 
                 lstDate, "Value", "Text", 1
                 );
+            ViewData["Movie"] = new SelectList(_context.Movie, "Id", "Title");
 
             return View();
         }
@@ -138,7 +135,7 @@ namespace MovieStoreMvc.Controllers
             {
                 return NotFound();
             }
-            ViewData["SeatId"] = new SelectList(_context.Seat, "Id", "Position", ticket.SeatId);
+            ViewData["SeatId"] = new SelectList(_context.Seat, "Id", "Id", ticket.SeatId);
             ViewData["ShowtimesId"] = new SelectList(_context.Showtimes, "Id", "StartTime", ticket.ShowtimesId);
             return View(ticket);
         }
@@ -226,29 +223,33 @@ namespace MovieStoreMvc.Controllers
 
         [HttpGet]
         [Route("Tickets/GetSeats")]
-        public JsonResult GetSeatByRoom(int? RoomId)
+        public JsonResult GetSeats(int? showtimesId)
         {
+            var RoomId = _context.Showtimes.Where(e => e.Id == showtimesId).Select(e => e.RoomId).FirstOrDefault();
             var seats = _context.Seat.Where(s => s.RoomId == RoomId).Select(s => s.Position);
 
             return Json(seats.ToList());
         }
 
         [HttpGet]
-        [Route("Tickets/GetTimes")]
+        [Route("Tickets/GetShowtimes")]
         public JsonResult GetTimesByDate(string date)
         {
             CultureInfo culture = new CultureInfo("es-ES");
             DateTime myDate = DateTime.Parse(date, culture);
 
-            var times = _context.Showtimes
-            .Where(s => s.StartTime.Day == myDate.Day && s.StartTime.Month == myDate.Month && s.StartTime.Year == myDate.Year)
-            .Select(s => s.StartTime.ToString("H:mm"));
+            var showtimes = _context.Showtimes
+              .Where(s => s.StartTime.Date == myDate && s.StartTime >= DateTime.Now)
+              .OrderBy(s => s.FormatId)
+              .Select(s => new
+              {
+                  s.Id,
+                  showtimes = s.format.Name + " - " + s.StartTime.ToString("H:mm")
+              })
+              .ToList();
 
-            return Json(times.ToList());
+            return Json(showtimes);
         }
-
-
-
 
     }
 }
