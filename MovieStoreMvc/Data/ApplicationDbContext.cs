@@ -101,6 +101,8 @@ namespace MovieStoreMvc.Data
 
         public DbSet<MovieStoreMvc.Models.Ticket> Ticket { get; set; }
 
+        public DbSet<MovieStoreMvc.Models.Surcharge> Surcharge { get; set; }
+
 
     }
 }

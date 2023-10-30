@@ -25,47 +25,67 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li> *@
-
-
-                        @* cmt tạm cho dễ nhìn *@
+                        
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Movies" asp-action="Index">Movie</a>
                         </li>
-                        @* <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Genre</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Formats" asp-action="Index">Format</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Countries" asp-action="Index">Country</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Manufacturers" asp-action="Index">Manufacturer</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Ratings" asp-action="Index">Rating</a>
-                        </li> *@
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="SeatTypes" asp-action="Index">SeatType</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="RoomTypes" asp-action="Index">RoomType</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cinemas" asp-action="Index">Cinema</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Rooms" asp-action="Index">Room</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Seats" asp-action="Index">Seat</a>
-                        </li>
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin Movie
+                            </button>
+                            <ul class="dropdown-menu">
+
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Genres" asp-action="Index">Genre</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Formats" asp-action="Index">Format</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Countries" asp-action="Index">Country</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Manufacturers" asp-action="Index">Manufacturer</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Ratings" asp-action="Index">Rating</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin Cinema
+                            </button>
+                            <ul class="dropdown-menu">
+                                
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="SeatTypes" asp-action="Index">SeatType</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="RoomTypes" asp-action="Index">RoomType</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Cinemas" asp-action="Index">Cinema</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Index">Room</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Seats" asp-action="Index">Seat</a>
+                                </li>
+
+                            </ul>
+                        </div>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Showtimes" asp-action="Index">Showtimes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Tickets" asp-action="Index">Ticket</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Surcharges" asp-action="Index">Surcharge</a>
                         </li>
                         
                     </ul>

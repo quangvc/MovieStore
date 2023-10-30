@@ -48,6 +48,12 @@
                 </select>
             </div>
 
+            <div class="form-group d-none" id="price-block">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" readonly />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
@@ -92,7 +98,6 @@
                         }
                     });
                 }
-                
             });
 
             $("#showtimes").on("change", function () {
@@ -112,6 +117,23 @@
                     }
                 });
             });
+
+            $("#seat").on("change", function () {
+                var showtimesId = $('#showtimes').val();
+                var SeatPosition = $('#seat').val();
+                $("#price-block").removeClass("d-none");
+
+                $.ajax({
+                    type: 'GET',
+                    url: 'GetPrice?showtimesId=' + showtimesId + '&SeatPosition=' + SeatPosition,
+                    success: function (data, status, xhr) {
+
+                        $('#Price').val(data);
+
+                    }
+                });
+            });
+
 
 
         });
