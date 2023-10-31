@@ -87,7 +87,7 @@ namespace MovieStoreMvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,CreatedDate")] Ticket ticket, string seat, string date, int showtimes)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,CreatedDate")] Ticket ticket, string seat, int showtimes)
         {
             if (ModelState.IsValid)
             {

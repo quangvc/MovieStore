@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Statistic";
+}
+
+<h1>Statistic</h1>
+
+<div id="chart-container"></div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <!-- Include jQuery -->
+    <script type="text/javascript" src=" https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- Include fusioncharts core library file -->
+    <script type="text/javascript" src=" https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+    <!-- Include fusion theme file -->
+    <script type="text/javascript" src=" https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+    <!-- Include fusioncharts jquery plugin -->
+    <script type="text/javascript" src=" https://rawgit.com/fusioncharts/fusioncharts-jquery-plugin/develop/dist/fusioncharts.jqueryplugin.min.js"></script>
+    <script type="text/javascript">
+        //STEP 2 - Chart Data
+        const chartData = []
+        //STEP 3 - Chart Configurations
+        const chartConfigs = {
+            type: "column2d",
+            width: "100%",
+            height: "300%",
+            dataFormat: "json",
+            dataSource: {
+                // Chart Configuration
+                "chart": {
+                    "caption": "Thống kê cái gì đây?",
+                    "subCaption": "Thống kê doanh thu bán vé theo phim nhé!!",
+                    "xAxisName": "Movie",
+                    "yAxisName": "Doanh thu",
+                    "numberSuffix": " VND",
+                    "theme": "fusion",
+                },
+                // Chart Data
+                "data": chartData
+            }
+        }
+        // Create a chart container
+        $('document').ready(function () {
+            $("#chart-container").insertFusionCharts(chartConfigs);
+        });
+        GetRevenueByMovie()
+        function GetRevenueByMovie(year) {
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: 'Statistics/RevenueByMovie',
+                        success: function (data, status, xhr) {
+                    data.map(i => {
+                        return chartData.push({
+                            label: i.title,
+                            value: i.revenue
+                        })
+                    });
+
+                    $("#chart-container").insertFusionCharts(chartConfigs);
+                }
+            });
+        }
+
+    </script>
+    }
