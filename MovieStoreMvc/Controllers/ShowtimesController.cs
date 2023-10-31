@@ -22,7 +22,18 @@ namespace MovieStoreMvc.Controllers
         // GET: Showtimes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Showtimes.Include(s => s.format).Include(s => s.movie).Include(s => s.room);
+            var applicationDbContext = _context.Showtimes.Include(s => s.format).Include(s => s.movie).Include(s => s.room)
+                .Select(s => new Showtimes()
+                {
+                    Id = s.Id,
+                    StartTime = s.StartTime,
+                    Price = s.Price,
+                    movie = s.movie,
+                    room = s.room,
+                    format = s.format,
+                    TicketSold = _context.Ticket.Count(t => t.ShowtimesId == s.Id),
+                    TotalPrice = _context.Ticket.Where(t => t.ShowtimesId == s.Id).Select(t => t.Price).Sum(),
+                });
             return View(await applicationDbContext.ToListAsync());
         }
 
