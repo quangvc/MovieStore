@@ -232,13 +232,15 @@ namespace MovieStoreMvc.Controllers
 
         [HttpGet]
         [Route("Tickets/GetShowtimes")]
-        public JsonResult GetTimesByDate(string date)
+        public JsonResult GetTimesByDate(string date, int cinema, int movie)
         {
             CultureInfo culture = new CultureInfo("es-ES");
             DateTime myDate = DateTime.Parse(date, culture);
 
             var showtimes = _context.Showtimes
-              .Where(s => s.StartTime.Date == myDate && s.StartTime >= DateTime.Now)
+                .Include(s => s.room)
+                    .ThenInclude(r => r.cinema)
+              .Where(s => s.StartTime.Date == myDate && s.StartTime >= DateTime.Now && s.MovieId == movie && s.room.cinema.Id == cinema)
               .OrderBy(s => s.FormatId)
               .Select(s => new
               {
