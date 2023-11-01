@@ -41,11 +41,16 @@
                 </select>
             </div>
 
-            <div class="form-group d-none" id="seat-block">
+            @* <div class="form-group d-none" id="seat-block">
                 <label class="control-label">Seat</label>
                 <select class="form-control" id="seat" name="seat">
                     <option value="" hidden>-- Chọn Seat --</option>
                 </select>
+            </div> *@
+
+            <div class="form-group d-none" id="seat-block">
+                <label class="control-label">Seat</label>
+                <div id="seat" name="seat"></div>
             </div>
 
             <div class="form-group d-none" id="price-block">
@@ -78,7 +83,6 @@
 
     <script>
         $(document).ready(function () {
-
             $("#movie,#cinema,#date").on("change", function () {
                 var movie = $('#movie').val();
                 var cinema = $('#cinema').val();
@@ -99,7 +103,6 @@
                     });
                 }
             });
-
             $("#showtimes").on("change", function () {
                 var showtimesId = $('#showtimes').val();
                 $("#seat-block").removeClass("d-none");
@@ -109,29 +112,51 @@
                     // dataType: "json",
                     url: 'GetSeats?showtimesId=' + showtimesId,
                     success: function (data, status, xhr) {
-
-                        $("option.seat-option").remove();
+                        var firstChar = "A";
                         $.each(data, function (index, value) {
-                            $("#seat").append('<option class="seat-option" value="' + value + '">' + value + '</option>');
+                            if (value.position.charAt(0) != firstChar) {
+                                $("#seat").append('<br>')
+                            }
+                            firstChar = value.position.charAt(0);
+                            if (value.isorder == null) {
+                                $("#seat").append('<span class="border border-1 text-white text-center bg-danger seat-option" data-id="' + value.position + '" style="display:inline-block;width:50px">' + value.position + '</span>');
+                            } else {
+                                $("#seat").append('<span class="border border-1 text-white text-center bg-secondary seat-option" data-id="' + value.position + '" style="display:inline-block;width:50px">' + value.position + '</span>');
+
+                            }
+                                
                         });
                     }
                 });
             });
 
-            $("#seat").on("change", function () {
+
+            var SeatPositions = []
+            $(document).on("click", ".seat-option", function () {
+
                 var showtimesId = $('#showtimes').val();
-                var SeatPosition = $('#seat').val();
                 $("#price-block").removeClass("d-none");
+                $(this).toggleClass("bg-danger").toggleClass("bg-warning");
+
+                var seatId = $(this).data("id");
+                if (SeatPositions.includes(seatId)) {
+                    SeatPositions = SeatPositions.filter(id => id !== seatId);
+                } else {
+                    SeatPositions.push(seatId);
+                }
+
+                var Ids = SeatPositions.join(',')
 
                 $.ajax({
                     type: 'GET',
-                    url: 'GetPrice?showtimesId=' + showtimesId + '&SeatPosition=' + SeatPosition,
+                    url: 'GetPrice?showtimesId=' + showtimesId + '&SeatPositions=' + Ids,
                     success: function (data, status, xhr) {
 
                         $('#Price').val(data);
 
                     }
                 });
+
             });
 
 
