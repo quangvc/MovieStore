@@ -74,7 +74,6 @@ namespace MovieStoreMvc.Controllers
             }
 
             ViewData["Date"] = new SelectList(
-
                 lstDate, "Value", "Text", 1
                 );
             ViewData["Movie"] = new SelectList(_context.Movie, "Id", "Title");
@@ -87,32 +86,64 @@ namespace MovieStoreMvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,CreatedDate")] Ticket ticket, string seat, int showtimes)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Ticket ticket, string ids, int showtimes)
         {
             if (ModelState.IsValid)
             {
-                //CultureInfo culture = new CultureInfo("es-ES");
-                //DateTime myDate = DateTime.Parse(date, culture);
+                var arrPostitions = ids.Split(',');
+                foreach (var seat in arrPostitions)
+                {
+                    Ticket newTicket = new Ticket();
+                    newTicket.Description = ticket.Description;
 
-                ticket.ShowtimesId = showtimes;
-
-                var newShowtimes = await _context.Showtimes
-                    .Include(s => s.format)
-                    .Include(s => s.movie)
-                    .Include(s => s.room)
-                    .FirstOrDefaultAsync(s => s.Id == ticket.ShowtimesId);
-
-                ticket.SeatId = await _context.Seat.Where(s => s.RoomId == newShowtimes.RoomId && s.Position.Equals(seat)).Select(s => s.Id).FirstOrDefaultAsync();
-
-                var newSeat = await _context.Seat
-                    .Include(s => s.room)
+                    newTicket.ShowtimesId = showtimes;
+                    var newShowtimes = await _context.Showtimes
+                        .Include(s => s.format)
+                        .Include(s => s.movie)
+                        .Include(s => s.room)
+                        .FirstOrDefaultAsync(s => s.Id == newTicket.ShowtimesId);
+                    newTicket.SeatId = await _context.Seat
+                        .Where(s => s.RoomId == newShowtimes.RoomId && s.Position.Equals(seat))
+                        .Select(s => s.Id)
+                        .FirstOrDefaultAsync();
+                    var newSeat = await _context.Seat
+                        .Include(s => s.room)
                         .ThenInclude(r => r.cinema)
-                    .FirstOrDefaultAsync(s => s.Id == ticket.SeatId);
+                        .FirstOrDefaultAsync(s => s.Id == newTicket.SeatId);
+                    newTicket.CreatedDate = DateTime.Now;
+                    newTicket.Name = newShowtimes.format.Name + " " + newShowtimes.movie.Title + " [" + newShowtimes.room.Name + "-" + seat + "]" + "\n" + newShowtimes.StartTime + "\n" + newSeat.room.cinema.Name;
 
-                ticket.CreatedDate = DateTime.Now;
+                    var ticketPrice = await _context.Seat
+                        .Include(s => s.seatType)
+                        .Where(s => s.Id == newTicket.SeatId).Select(s => s.seatType.Price).FirstOrDefaultAsync();
 
-                ticket.Name = newShowtimes.format.Name + " " + newShowtimes.movie.Title + " [" + newShowtimes.room.Name + "-" + seat + "]" + "\n" + newShowtimes.StartTime + "\n" + newSeat.room.cinema.Name;
-                _context.Add(ticket);
+                    newTicket.Price = 0;
+                    if (ticketPrice != 0)
+                    {
+                        newTicket.Price = ticketPrice;
+                    }
+                    else
+                    {
+                        newTicket.Price = newShowtimes.Price;
+                        var seatTypeSurcharges = await _context.Surcharge.Where(c => c.SeatTypeId == newSeat.SeatTypeId).Select(c => c.Value).FirstOrDefaultAsync();
+                        var roomSurcharges = await _context.Surcharge.Where(c => c.RoomId == newShowtimes.RoomId).Select(c => c.Value).FirstOrDefaultAsync();
+                        var formatMovieSurcharges = await _context.Surcharge.Where(c => c.FormatId == newShowtimes.FormatId).Select(c => c.Value).FirstOrDefaultAsync();
+                        if (seatTypeSurcharges != 0)
+                        {
+                            newTicket.Price += seatTypeSurcharges;
+                        }
+                        if (roomSurcharges != 0)
+                        {
+                            newTicket.Price += roomSurcharges;
+                        }
+                        if (formatMovieSurcharges != 0)
+                        {
+                            newTicket.Price += formatMovieSurcharges;
+                        }
+                    }
+
+                    _context.Add(newTicket);
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -225,9 +256,11 @@ namespace MovieStoreMvc.Controllers
         public JsonResult GetSeats(int? showtimesId)
         {
             var RoomId = _context.Showtimes.Where(e => e.Id == showtimesId).Select(e => e.RoomId).FirstOrDefault();
-            var seats = _context.Seat.Where(s => s.RoomId == RoomId).Select(s => new {
+            var seats = _context.Seat.Include(s => s.seatType).Where(s => s.RoomId == RoomId).Select(s => new
+            {
                 Position = s.Position,
-                IsOrder = _context.Ticket.Where(t => t.ShowtimesId == showtimesId && t.SeatId == s.Id).FirstOrDefault()
+                IsOrder = _context.Ticket.Where(t => t.ShowtimesId == showtimesId && t.SeatId == s.Id).FirstOrDefault(),
+                SeatType = s.seatType.Name
             });
 
             return Json(seats.ToList());

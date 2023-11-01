@@ -41,16 +41,10 @@
                 </select>
             </div>
 
-            @* <div class="form-group d-none" id="seat-block">
-                <label class="control-label">Seat</label>
-                <select class="form-control" id="seat" name="seat">
-                    <option value="" hidden>-- Chọn Seat --</option>
-                </select>
-            </div> *@
-
             <div class="form-group d-none" id="seat-block">
                 <label class="control-label">Seat</label>
                 <div id="seat" name="seat"></div>
+                <input type="text" id="ids" name="ids" hidden />
             </div>
 
             <div class="form-group d-none" id="price-block">
@@ -69,6 +63,13 @@
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
+    </div>
+    <div class="col-md-4 d-flex align-items-center">
+        <div class="m-md-5">
+            <span class="border border-1 text-center bg-light seat-option" style="display:inline-block;width:50px">A1</span><span> : Ghế thường</span><br />
+            <span class="border border-1 text-center bg-danger seat-option" style="display:inline-block;width:50px">B1</span><span> : Ghế VIP</span><br />
+            <span class="border border-1 text-center bg-secondary seat-option" style="display:inline-block;width:50px">C1</span><span> : Ghế đã được đặt</span><br />
+        </div>
     </div>
 </div>
 
@@ -118,10 +119,18 @@
                                 $("#seat").append('<br>')
                             }
                             firstChar = value.position.charAt(0);
-                            if (value.isorder == null) {
-                                $("#seat").append('<span class="border border-1 text-white text-center bg-danger seat-option" data-id="' + value.position + '" style="display:inline-block;width:50px">' + value.position + '</span>');
+                            if (value.isOrder == null) {
+                                if (value.seatType == "Thường") {
+                                    $("#seat").append('<span class="border border-1 text-center bg-light seat-option" data-id="' + value.position + '" style="display:inline-block;width:50px">' + value.position + '</span>');
+                                }
+                                else if (value.seatType == "VIP") {
+                                    $("#seat").append('<span class="border border-1 text-white text-center bg-danger seat-option" data-id="' + value.position + '" style="display:inline-block;width:50px">' + value.position + '</span>');
+                                }
+
+
+                            
                             } else {
-                                $("#seat").append('<span class="border border-1 text-white text-center bg-secondary seat-option" data-id="' + value.position + '" style="display:inline-block;width:50px">' + value.position + '</span>');
+                                $("#seat").append('<span class="border border-1 text-white text-center bg-secondary" data-id="' + value.position + '" style="display:inline-block;width:50px">' + value.position + '</span>');
 
                             }
                                 
@@ -146,14 +155,13 @@
                 }
 
                 var Ids = SeatPositions.join(',')
+                $('#ids').val(Ids)
 
                 $.ajax({
                     type: 'GET',
                     url: 'GetPrice?showtimesId=' + showtimesId + '&SeatPositions=' + Ids,
                     success: function (data, status, xhr) {
-
                         $('#Price').val(data);
-
                     }
                 });
 
