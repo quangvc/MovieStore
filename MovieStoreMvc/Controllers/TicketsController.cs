@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,6 +19,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace MovieStoreMvc.Controllers
 {
+    [Authorize(Roles = "Admin, Employee")]
     public class TicketsController : Controller
     {
         private readonly ApplicationDbContext _context;
