@@ -78,6 +78,9 @@
 
                             </ul>
                         </div>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="AppUsers" asp-action="Index">User</a>
+                            </li>
                         }
                         @if (User.Identity.IsAuthenticated)
                         {   
@@ -94,9 +97,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Statistics" asp-action="Index">Statistic</a>
                         </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AppUsers" asp-action="Index">User</a>
-                        </li>
+                        
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

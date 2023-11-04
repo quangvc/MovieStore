@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using MovieStoreMvc.Models;
+using MimeKit;
 
 namespace MovieStoreMvc.Areas.Identity.Pages.Account
 {
@@ -112,7 +113,7 @@ namespace MovieStoreMvc.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
@@ -137,5 +138,65 @@ namespace MovieStoreMvc.Areas.Identity.Pages.Account
             // If we got this far, something failed, redisplay form
             return Page();
         }
+
+
+        //public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        //{
+        //    returnUrl = returnUrl ?? Url.Content("~/");
+        //    // Đã đăng nhập nên chuyển hướng về Index
+        //    if (_signInManager.IsSignedIn(User)) return Redirect("Index");
+
+        //    if (ModelState.IsValid)
+        //    {
+
+        //        IdentityUser user = await _signInManager.FindByEmailAsync(Input.UserNameOrEmail);
+        //        if (user == null)
+        //            user = await _signInManager.FindByNameAsync(Input.UserNameOrEmail);
+
+        //        if (user == null)
+        //        {
+        //            ModelState.AddModelError(string.Empty, "Tài khoản không tồn tại.");
+        //            return Page();
+        //        }
+
+        //        var result = await _signInManager.PasswordSignInAsync(
+        //                user.UserName,
+        //                Input.Password,
+        //                Input.RememberMe,           // Có lưu cookie - khi đóng trình duyệt vẫn nhớ
+        //                true                        // CÓ ÁP DỤNG LOCKOUT
+        //            );
+
+
+        //        if (result.Succeeded)
+        //        {
+        //            _logger.LogInformation("User đã đăng nhập");
+        //            return ViewComponent(MessagePage.COMPONENTNAME, new MessagePage.Message()
+        //            {
+        //                title = "Đã đăng nhập",
+        //                htmlcontent = "Đăng nhập thành công",
+        //                urlredirect = returnUrl
+        //            });
+        //        }
+        //        if (result.RequiresTwoFactor)
+        //        {
+        //            // Nếu cấu hình đăng nhập hai yếu tố thì chuyển hướng đến LoginWith2fa
+        //            return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+        //        }
+        //        if (result.IsLockedOut)
+        //        {
+        //            _logger.LogWarning("Tài khoản bí tạm khóa.");
+        //            // Chuyển hướng đến trang Lockout - hiện thị thông báo
+        //            return RedirectToPage("./Lockout");
+        //        }
+        //        else
+        //        {
+        //            ModelState.AddModelError(string.Empty, "Không đăng nhập được.");
+        //            return Page();
+        //        }
+        //    }
+
+        //    return Page();
+        //}
+
     }
 }

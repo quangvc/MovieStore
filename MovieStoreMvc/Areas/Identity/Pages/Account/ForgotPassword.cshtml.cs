@@ -50,19 +50,52 @@ namespace MovieStoreMvc.Areas.Identity.Pages.Account
             public string Email { get; set; }
         }
 
+        //public async Task<IActionResult> OnPostAsync()
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var user = await _userManager.FindByEmailAsync(Input.Email);
+        //        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+        //        {
+        //            // Don't reveal that the user does not exist or is not confirmed
+        //            return RedirectToPage("./ForgotPasswordConfirmation");
+        //        }
+
+        //        // For more information on how to enable account confirmation and password reset please
+        //        // visit https://go.microsoft.com/fwlink/?LinkID=532713
+        //        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        //        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+        //        var callbackUrl = Url.Page(
+        //            "/Account/ResetPassword",
+        //            pageHandler: null,
+        //            values: new { area = "Identity", code },
+        //            protocol: Request.Scheme);
+
+        //        await _emailSender.SendEmailAsync(
+        //            Input.Email,
+        //            "Reset Password",
+        //            $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+        //        return RedirectToPage("./ForgotPasswordConfirmation");
+        //    }
+
+        //    return Page();
+        //}
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)
             {
+                // Tìm user theo email gửi đến
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
+                // Phát sinh Token để reset password
+                // Token sẽ được kèm vào link trong email,
+                // link dẫn đến trang /Account/ResetPassword để kiểm tra và đặt lại mật khẩu
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
@@ -71,15 +104,21 @@ namespace MovieStoreMvc.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
+                // Gửi email
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Đặt lại mật khẩu",
+                    $"Để đặt lại mật khẩu hãy <a href='{callbackUrl}'>bấm vào đây</a>.");
 
+                // Chuyển đến trang thông báo đã gửi mail để reset password
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
 
             return Page();
         }
+
+
+
+
     }
 }
