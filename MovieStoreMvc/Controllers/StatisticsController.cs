@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieStoreMvc.Data;
+using System;
 
 namespace MovieStoreMvc.Controllers
 {
@@ -23,7 +24,7 @@ namespace MovieStoreMvc.Controllers
 
         [HttpGet]
         [Route("Statistics/RevenueByMovie")]
-        public JsonResult GetStatisticAsync(int? startDate)
+        public JsonResult GetStatisticAsync()
         {
             var data = _context.Movie.Select(x => new
             {
@@ -35,11 +36,34 @@ namespace MovieStoreMvc.Controllers
             return Json(data.ToList());
         }
 
+        [HttpGet]
+        [Route("Statistics/RevenueByYear")]
+        public JsonResult RevenueByYearAsync()
+        {
+            var data = _context.Ticket.Include(t => t.showtimes).GroupBy(t => t.CreatedDate.Year).Select(t => new
+            {
+                Year = t.Key,
+                Revenue = t.Sum(s => s.Price)
+            });
 
+            return Json(data.ToList());
+        }
 
+        [HttpGet]
+        [Route("Statistics/FromDateToDate")]
+        public JsonResult RevenueFromDateToDateAsync(DateTime startDate, DateTime endDate)
+        {
+            
+            var data = _context.Ticket.Include(t => t.showtimes)
+                .Where(t => t.showtimes.StartTime.Date >= startDate && t.showtimes.StartTime.Date <= endDate)
+                .GroupBy(t => t.CreatedDate.Date).Select(t => new
+                {
+                    Date = t.Key.Date,
+                    Revenue = t.Sum(s => s.Price)
+                });
 
-
-
+            return Json(data.ToList());
+        }
 
 
 

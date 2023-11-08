@@ -4,6 +4,31 @@
 
 <h1>Statistic</h1>
 
+<select class="form-select w-25 statistic">
+    <option value="0" selected>Doanh thu theo phim</option>
+    <option value="1">Doanh thu theo năm</option>
+    <option value="2">Doanh thu từ ngày đến ngày</option>
+    <option value="3">Three</option>
+</select>
+
+<form id="from-to" class="my-3 d-none" method="get">
+    
+    <div class="row">
+        <div class="col-lg-2 col-sm-5">
+            <label for="startDate">Start</label>
+            <input id="startDate" class="form-control shadow" type="date" />
+        </div>
+        <div class="col-lg-2 col-sm-5">
+            <label for="endDate">End</label>
+            <input id="endDate" class="form-control shadow" type="date" />
+        </div>
+        <div class="col-auto row align-items-end">
+            <button type="submit" class="col btn btn-primary">Submit</button>
+        </div>
+    </div>
+    
+</form>
+
 <div id="chart-container"></div>
 
 @section Scripts {
@@ -25,18 +50,11 @@
         const chartConfigs = {
             type: "column2d",
             width: "100%",
-            height: "300%",
+            height: "200%",
             dataFormat: "json",
             dataSource: {
                 // Chart Configuration
-                "chart": {
-                    "caption": "Thống kê cái gì đây?",
-                    "subCaption": "Thống kê doanh thu bán vé theo phim nhé!!",
-                    "xAxisName": "Movie",
-                    "yAxisName": "Doanh thu",
-                    "numberSuffix": " VND",
-                    "theme": "fusion",
-                },
+                "chart": {},
                 // Chart Data
                 "data": chartData
             }
@@ -44,25 +62,141 @@
         // Create a chart container
         $('document').ready(function () {
             $("#chart-container").insertFusionCharts(chartConfigs);
+            GetRevenueByMovie()
+
+            $(".statistic").on("change", function () {
+                if ($(".statistic").val() == 1) {
+                    chartData.length = 0;
+                    GetRevenueByYear()
+
+                } else if ($(".statistic").val() == 0) {
+                    chartData.length = 0;
+                    GetRevenueByMovie()
+
+                } else if ($(".statistic").val() == 2) {
+                    $("#from-to").removeClass("d-none")
+
+                    var now = new Date();
+                    var month = (now.getMonth() + 1);
+                    var day = now.getDate();
+                    if (month < 10)
+                        month = "0" + month;
+                    if (day < 10)
+                        day = "0" + day;
+                    var today = now.getFullYear() + '-' + month + '-' + day;
+                    $("#startDate").val("2023-10-01");
+                    $("#endDate").val(today);
+                }
+
+                if ($(".statistic").val() != 2) {
+                    $("#from-to").addClass("d-none")
+                }
+            })
+            $("#from-to").on("submit", function (event) {
+                event.preventDefault();
+                
+                var startDate = $("#startDate").val()
+                var endDate = $("#endDate").val()
+                chartData.length = 0;
+
+                GetRevenueFromTo(startDate, endDate);
+            })
+
+
         });
-        GetRevenueByMovie()
-        function GetRevenueByMovie(year) {
+        function GetRevenueByMovie() {
             $.ajax({
                 type: 'GET',
                 dataType: "json",
                 url: 'Statistics/RevenueByMovie',
-                        success: function (data, status, xhr) {
+                success: function (data, status, xhr) {
                     data.map(i => {
-                        return chartData.push({
-                            label: i.title,
-                            value: i.revenue
-                        })
-                    });
+                    return chartData.push({
+                        label: i.title,
+                        value: i.revenue
+                    })
+                });
 
-                    $("#chart-container").insertFusionCharts(chartConfigs);
+                chartConfigs.dataSource.chart = {
+                    "caption": "Thống kê cái gì đây?",
+                    "subCaption": "Thống kê doanh thu bán vé theo phim nhé!!",
+                    "xAxisName": "Movie",
+                    "yAxisName": "Doanh thu",
+                    "numberSuffix": " VND",
+                    "theme": "fusion",
+                }
+
+                $("#chart-container").insertFusionCharts(chartConfigs);
                 }
             });
         }
 
+        function GetRevenueByYear() {
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: 'Statistics/RevenueByYear',
+                success: function (data, status, xhr) {
+                    data.map(i => {
+                    return chartData.push({
+                        label: i.year.toString(),
+                        value: i.revenue
+                    })
+                });
+
+                chartConfigs.dataSource.chart = {
+                    "caption": "Thống kê cái gì đây?",
+                    "subCaption": "Thống kê doanh thu bán vé theo năm nhé!!",
+                    "xAxisName": "Năm",
+                    "yAxisName": "Doanh thu",
+                    "numberSuffix": " VND",
+                    "theme": "fusion",
+                }
+
+                $("#chart-container").insertFusionCharts(chartConfigs);
+                }
+            });
+        }
+
+        function GetRevenueFromTo(startDate, endDate) {
+            
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: 'Statistics/FromDateToDate?startDate=' + startDate + '&endDate=' + endDate,
+                success: function (data, status, xhr) {
+                    data.map(i => {
+
+                        var datetime = new Date(i.date);
+
+                        var date = datetime.getDate();
+                        var month = datetime.getMonth() + 1; // Tháng được đánh số từ 0 đến 11, nên cần cộng thêm 1
+                        var year = datetime.getFullYear();
+
+                        i.date = date + "-" + month + "-" + datetime.getFullYear();
+
+                        return chartData.push({
+                            // label: i.date.split('T')[0],
+                            label: i.date,
+                            value: i.revenue
+                        })
+                    });
+
+                chartConfigs.dataSource.chart = {
+                    "caption": "Thống kê cái gì đây?",
+                    "subCaption": "Thống kê doanh thu bán vé từ ngày " + startDate + " đến ngày " + endDate + " nhé!!",
+                    "xAxisName": "Date",
+                    "yAxisName": "Doanh thu",
+                    "numberSuffix": " VND",
+                    "theme": "fusion",
+                }
+
+                    $("#chart-container").insertFusionCharts(chartConfigs);
+                }
+
+            });
+        }
+
+
     </script>
-    }
+}
