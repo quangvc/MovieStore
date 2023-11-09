@@ -2,10 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieStoreMvc.Data;
+using MovieStoreMvc.Models;
 using System;
 
 namespace MovieStoreMvc.Controllers
 {
+    public class MovieSeatCoverage
+    {
+        public string Movie { get; set; }
+        public int? TotalTickets { get; set; }
+        public int TotalSeats { get; set; }
+        public List<int> CountSeats { get; set; }
+        public double Ratio { get; set; }
+    }
     [Authorize(Roles = "Admin, Employee")]
     public class StatisticsController : Controller
     {
@@ -30,7 +39,7 @@ namespace MovieStoreMvc.Controllers
             {
                 Id = x.Id,
                 Title = x.Title,
-                Revenue = _context.Ticket.Include(t => t.showtimes).Where(t => t.showtimes.MovieId == x.Id).Select(t => t.Price).Sum(),
+                Revenue = _context.Ticket.Include(t => t.showtimes).Where(t => t.showtimes.MovieId == x.Id).Select(t => t.Price).Sum().ToString(),
             });
 
             return Json(data.ToList());
@@ -58,11 +67,33 @@ namespace MovieStoreMvc.Controllers
                 .Where(t => t.showtimes.StartTime.Date >= startDate && t.showtimes.StartTime.Date <= endDate)
                 .GroupBy(t => t.CreatedDate.Date).Select(t => new
                 {
-                    Date = t.Key.Date,
+                    Date = t.Key.ToString("dd-MM-yyyy"),
                     Revenue = t.Sum(s => s.Price)
                 });
 
             return Json(data.ToList());
+        }
+
+        [HttpGet]
+        [Route("Statistics/SeatCoverageRatio")]
+        public JsonResult SeatCoverageRatio()
+        {
+            var data = _context.Movie
+                .Select(m => new MovieSeatCoverage
+                {
+                    Movie = m.Title,
+                    TotalTickets = _context.Ticket.Include(t => t.showtimes).Where(t => t.showtimes.MovieId == m.Id).Count(),
+                    CountSeats = _context.Showtimes.Include(s => s.movie).Where(s => s.MovieId == m.Id)
+                        .Select(s => s.room.Seats.Count).ToList(),
+                }).ToList();
+
+            data.ForEach(t =>
+            {
+                t.TotalSeats = t.CountSeats.Sum();
+                t.Ratio = t.TotalSeats == 0 ? 0 : (double)t.TotalTickets * 100 / t.TotalSeats;
+            });
+
+            return Json(data);
         }
 
 

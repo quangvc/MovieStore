@@ -8,7 +8,7 @@
     <option value="0" selected>Doanh thu theo phim</option>
     <option value="1">Doanh thu theo năm</option>
     <option value="2">Doanh thu từ ngày đến ngày</option>
-    <option value="3">Three</option>
+    <option value="3">Tỉ lệ bao phủ ghế</option>
 </select>
 
 <form id="from-to" class="my-3 d-none" method="get">
@@ -86,6 +86,11 @@
                     var today = now.getFullYear() + '-' + month + '-' + day;
                     $("#startDate").val("2023-10-01");
                     $("#endDate").val(today);
+                } 
+                else if ($(".statistic").val() == 3) 
+                {
+                    chartData.length = 0;
+                    SeatCoverageRatio()
                 }
 
                 if ($(".statistic").val() != 2) {
@@ -167,13 +172,12 @@
                 success: function (data, status, xhr) {
                     data.map(i => {
 
-                        var datetime = new Date(i.date);
-
-                        var date = datetime.getDate();
-                        var month = datetime.getMonth() + 1; // Tháng được đánh số từ 0 đến 11, nên cần cộng thêm 1
-                        var year = datetime.getFullYear();
-
-                        i.date = date + "-" + month + "-" + datetime.getFullYear();
+                        // đã xử lý bên back end --- nên không cần đoạn này
+                        // var datetime = new Date(i.date);
+                        // var date = datetime.getDate();
+                        // var month = datetime.getMonth() + 1; // Tháng được đánh số từ 0 đến 11, nên cần cộng thêm 1
+                        // var year = datetime.getFullYear();
+                        // i.date = date + "-" + month + "-" + datetime.getFullYear();
 
                         return chartData.push({
                             // label: i.date.split('T')[0],
@@ -181,7 +185,7 @@
                             value: i.revenue
                         })
                     });
-
+                    
                 chartConfigs.dataSource.chart = {
                     "caption": "Thống kê cái gì đây?",
                     "subCaption": "Thống kê doanh thu bán vé từ ngày " + startDate + " đến ngày " + endDate + " nhé!!",
@@ -191,6 +195,33 @@
                     "theme": "fusion",
                 }
 
+                    $("#chart-container").insertFusionCharts(chartConfigs);
+                }
+
+            });
+        }
+
+        function SeatCoverageRatio() {
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: 'Statistics/SeatCoverageRatio',
+                success: function (data, status, xhr) {
+                    data.map(i => {
+                        return chartData.push({
+                            label: i.movie,
+                            value: i.ratio
+                        })
+                    });
+
+                    chartConfigs.dataSource.chart = {
+                        "caption": "Thống kê cái gì đây?",
+                        "subCaption": "Thống kê tỉ lệ bao phủ ghế nhé!!",
+                        "xAxisName": "Movie",
+                        "yAxisName": "Tỉ lệ bao phủ ghế",
+                        "numberSuffix": " %",
+                        "theme": "fusion",
+                    }
                     $("#chart-container").insertFusionCharts(chartConfigs);
                 }
 
