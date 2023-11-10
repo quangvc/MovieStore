@@ -1,0 +1,150 @@
+﻿
+<div class="container mt-4">
+    <h3>Autocomplete Select</h3>
+    <div class="form-group col-sm-3">
+        <label for="autocompleteSelect">Select a value:</label>
+        <input type="text" class="form-control" id="autocompleteSelect" placeholder="Type to search...">
+        <div id="autocompleteList" class="autocomplete-list"></div>
+    </div>
+</div>
+
+<div class="container mt-3">
+  <h2>Data List</h2>
+    <div class="col-sm-3">
+        <label for="browser" class="form-label">Choose your browser from the list:</label>
+        <input class="form-control" list="browsers" name="browser" id="browser">
+        <datalist id="browsers">
+            <option value="Edge">Edge</option>
+            <option value="Firefox"></option>
+            <option value="Chrome"></option>
+            <option value="Opera"></option>
+            <option value="Safari"></option>
+        </datalist>    
+        
+    </div>
+</div>
+
+<style>
+    #autocompleteList div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+    }
+
+    #autocompleteList div:hover {
+        /*when hovering an item:*/
+        background-color: #e9e9e9;
+    }
+
+    #autocompleteList {
+        /* position: absolute; */
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        /*position the autocomplete items to be the same width as the container:*/
+        /* top: 100%;
+        left: 0;
+        right: 0; */
+    }
+
+    .autocomplete-active {
+        /*when navigating through the items using the arrow keys:*/
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+    }
+
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Sample data for autocomplete
+            const autocompleteData = ["Apple", "Banana", "Orange", "Grapes", "Cherry", "Mango", "Pineapple"];
+            const autocompleteList = $("#autocompleteList");
+
+            var currentFocus;
+
+            // Initialize the autocomplete
+            $('#autocompleteSelect').on('input', function () {
+                currentFocus = -1;
+                const inputVal = $(this).val().toLowerCase();
+                autocompleteList.empty();
+
+                autocompleteData.forEach(function (item) {
+                    if (item.toLowerCase().includes(inputVal)) {
+                        autocompleteList.append('<div class="autocomplete-item">' + item + '</div>');
+                    }
+                });
+            });
+
+            $('#autocompleteSelect').on('focus', function () {
+                currentFocus = -1;
+                autocompleteList.empty();
+
+                autocompleteData.forEach(function (item) {
+                    autocompleteList.append('<div class="autocomplete-item">' + item + '</div>');
+                });
+            });
+
+            // Handle item click in autocomplete list
+            $(document).on('click', '.autocomplete-item', function () {
+                $('#autocompleteSelect').val($(this).text());
+                autocompleteList.empty();
+            });
+
+            // Hide autocomplete list when clicking outside the input and list
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#autocompleteSelect, #autocompleteList').length) {
+                    autocompleteList.empty();
+                }
+            });
+
+            $("#autocompleteSelect").on("keydown", function (e) {
+                var x = $("#autocompleteList");
+                if (x) x = x.find("div");
+                if (e.keyCode == 40) {
+                    /*Nếu nhấn phím mũi tên XUỐNG, tăng biến currentFocus lên:*/
+                    currentFocus++;
+                    /*và làm cho mục hiện tại trở nên rõ ràng hơn:*/
+                    addActive(x);
+                } else if (e.keyCode == 38) { //up
+                    /*Nếu nhấn phím mũi tên LÊN, giảm biến currentFocus xuống:*/
+                    currentFocus--;
+                    /*và làm cho mục hiện tại trở nên rõ ràng hơn:*/
+                    addActive(x);
+                } else if (e.keyCode == 13) {
+                    /*Nếu nhấn phím ENTER, ngăn form được gửi đi,*/
+                    e.preventDefault();
+                    if (currentFocus > -1) {
+                        /*và giả lập một cú nhấp chuột vào mục "active":*/
+                        if (x) x.eq(currentFocus).click();
+                    }
+                }
+            });
+
+            function addActive(x) {
+                /*một hàm để phân loại một mục là "active":*/
+                if (!x) return false;
+                /*bắt đầu bằng việc loại bỏ lớp "active" trên tất cả các mục:*/
+                removeActive(x);
+                if (currentFocus >= x.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = (x.length - 1);
+                /*thêm lớp "autocomplete-active":*/
+                x.eq(currentFocus).addClass("autocomplete-active");
+            }
+
+            function removeActive(x) {
+                /*một hàm để loại bỏ lớp "active" khỏi tất cả các mục autocomplete:*/
+                for (var i = 0; i < x.length; i++) {
+                    x.eq(i).removeClass("autocomplete-active");
+                }
+            }
+
+        });
+    </script>
+}

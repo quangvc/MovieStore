@@ -9,6 +9,7 @@
     <option value="1">Doanh thu theo năm</option>
     <option value="2">Doanh thu từ ngày đến ngày</option>
     <option value="3">Tỉ lệ bao phủ ghế</option>
+    <option value="4">Tỉ lệ bao phủ ghế của các rạp theo phim</option>
 </select>
 
 <form id="from-to" class="my-3 d-none" method="get">
@@ -92,6 +93,9 @@
                     chartData.length = 0;
                     SeatCoverageRatio()
                 }
+                else if ($(".statistic").val() == 4) {
+                    $(location).attr('href', '/Statistics/Index2');
+                }
 
                 if ($(".statistic").val() != 2) {
                     $("#from-to").addClass("d-none")
@@ -99,14 +103,11 @@
             })
             $("#from-to").on("submit", function (event) {
                 event.preventDefault();
-                
                 var startDate = $("#startDate").val()
                 var endDate = $("#endDate").val()
                 chartData.length = 0;
-
                 GetRevenueFromTo(startDate, endDate);
             })
-
 
         });
         function GetRevenueByMovie() {
@@ -121,7 +122,6 @@
                         value: i.revenue
                     })
                 });
-
                 chartConfigs.dataSource.chart = {
                     "caption": "Thống kê cái gì đây?",
                     "subCaption": "Thống kê doanh thu bán vé theo phim nhé!!",
@@ -130,7 +130,6 @@
                     "numberSuffix": " VND",
                     "theme": "fusion",
                 }
-
                 $("#chart-container").insertFusionCharts(chartConfigs);
                 }
             });
@@ -148,7 +147,6 @@
                         value: i.revenue
                     })
                 });
-
                 chartConfigs.dataSource.chart = {
                     "caption": "Thống kê cái gì đây?",
                     "subCaption": "Thống kê doanh thu bán vé theo năm nhé!!",
@@ -157,14 +155,12 @@
                     "numberSuffix": " VND",
                     "theme": "fusion",
                 }
-
                 $("#chart-container").insertFusionCharts(chartConfigs);
                 }
             });
         }
 
         function GetRevenueFromTo(startDate, endDate) {
-            
             $.ajax({
                 type: 'GET',
                 dataType: "json",
@@ -185,7 +181,6 @@
                             value: i.revenue
                         })
                     });
-                    
                 chartConfigs.dataSource.chart = {
                     "caption": "Thống kê cái gì đây?",
                     "subCaption": "Thống kê doanh thu bán vé từ ngày " + startDate + " đến ngày " + endDate + " nhé!!",
@@ -194,10 +189,8 @@
                     "numberSuffix": " VND",
                     "theme": "fusion",
                 }
-
                     $("#chart-container").insertFusionCharts(chartConfigs);
                 }
-
             });
         }
 
@@ -213,7 +206,6 @@
                             value: i.ratio
                         })
                     });
-
                     chartConfigs.dataSource.chart = {
                         "caption": "Thống kê cái gì đây?",
                         "subCaption": "Thống kê tỉ lệ bao phủ ghế nhé!!",
@@ -224,10 +216,8 @@
                     }
                     $("#chart-container").insertFusionCharts(chartConfigs);
                 }
-
             });
         }
-
 
     </script>
 }

@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "Statistic";
+}
+
+<h2>Tỉ lệ bao phủ ghế của các rạp theo phim</h2>
+
+<div class="text-end">
+    <a class="btn btn-info" asp-area="" asp-controller="Statistics" asp-action="Index">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5z" />
+        </svg> Back
+    </a>
+</div>
+
+<div id="chart-container"></div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <!-- Include jQuery -->
+    <script type="text/javascript" src=" https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- Include fusioncharts core library file -->
+    <script type="text/javascript" src=" https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+    <!-- Include fusion theme file -->
+    <script type="text/javascript" src=" https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+    <!-- Include fusioncharts jquery plugin -->
+    <script type="text/javascript" src=" https://rawgit.com/fusioncharts/fusioncharts-jquery-plugin/develop/dist/fusioncharts.jqueryplugin.min.js"></script>
+    <script type="text/javascript">
+        //STEP 2 - Chart Data
+        const categories = [
+            {
+                "category": []
+            }
+        ]
+        // STEP 3- Construct the dataset comprising multiple series
+        const dataset = []
+
+        //STEP 4 - Chart Configurations
+        const chartConfigs = {
+            type: 'mscolumn2d',// The chart type
+            width: '100%', // Width of the chart
+            height: '250%', // Height of the chart
+            dataFormat: 'json', // Data type
+            dataSource: {
+                //Chart Configurations
+                "chart": {
+                    "theme": "fusion",
+                    "caption": "Comparison of Quarterly Revenue",
+                    "xAxisname": "Quarter",
+                    "yAxisName": "Tỉ lệ bao phủ ghế (%)",
+                    // "numberPrefix": "$",
+                    "numberSuffix": " %",
+                    "plotFillAlpha": "80",
+                    "divLineIsDashed": "1",
+                    "divLineDashLen": "1",
+                    "divLineGapLen": "1"
+                },
+                "categories": categories,
+                "dataset": dataset,
+            }
+        }
+        // STEP 5 - Create a chart container
+        $('document').ready(function () {
+            SeatCoverageRatioByCinema();
+        });
+
+        function SeatCoverageRatioByCinema() {
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: 'SeatCoverageRatioByCinema',
+                success: function (data, status, xhr) {
+
+                    data[0].movies.forEach(movie => {
+                        categories[0].category.push({
+                            label: movie.movie
+                        });
+                    });
+
+                    data.forEach(cinema => {
+                        const cinemaData = {
+                            seriesname: cinema.cinema,
+                            data: []
+                        };
+
+                        cinema.movies.forEach(movie => {
+                            cinemaData.data.push({
+                                value: movie.ratio
+                            });
+                        });
+
+                        dataset.push(cinemaData);
+                    });
+
+
+                    chartConfigs.dataSource.chart = {
+                        "caption": "Thống kê cái gì đây?",
+                        "subCaption": "Thống kê tỉ lệ bao phủ ghế của các rạp theo phim nhé!!",
+                        "xAxisName": "Movie",
+                        "yAxisName": "Tỉ lệ bao phủ ghế",
+                        "numberSuffix": " %",
+                        "theme": "fusion",
+                    }
+                    $("#chart-container").insertFusionCharts(chartConfigs);
+                }
+            });
+        }
+    </script>
+}
